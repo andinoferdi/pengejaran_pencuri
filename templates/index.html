@@ -1,72 +1,130 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Pengejaran Pencuri</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="/static/styles.css">
-</head>
-<body class="bg-gradient-to-b from-gray-100 to-gray-200 min-h-screen">
-    <div class="container mx-auto px-4 py-8 flex flex-col items-center justify-center">
-        <div class="w-full max-w-3xl bg-white rounded-xl shadow-lg overflow-hidden mb-6">
-            <div class="p-4 text-center">
-                <h1 class="text-2xl font-bold text-gray-800">Pengejaran Pencuri</h1>
-                <p class="text-gray-600">Bantu pencuri mencapai rumah tanpa tertangkap polisi!</p>
-            </div>
-            
-            <div class="game-container relative mx-auto">
-                <canvas id="gameCanvas" width="600" height="650" class="border border-gray-300 rounded-lg shadow-sm cursor-pointer mx-auto"></canvas>
-                <div id="message" class="message hidden"></div>
-                <button id="restartBtn" class="restart-btn hidden">Main Lagi</button>
-            </div>
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="/static/styles.css" />
+    <link rel="icon" href="/static/favico.png" type="image/x-icon" />
+  </head>
+  <body class="bg-gradient-to-b from-gray-100 to-gray-200 min-h-screen">
+    <div
+      class="container mx-auto px-4 py-8 flex flex-col items-center justify-center"
+    >
+      <div
+        class="w-full max-w-3xl bg-white rounded-xl shadow-lg overflow-hidden mb-6"
+      >
+        <div class="p-4 text-center">
+          <h1 class="text-2xl font-bold text-gray-800">Pengejaran Pencuri</h1>
+          <p class="text-gray-600">
+            Bantu pencuri mencapai rumah tanpa tertangkap polisi!
+          </p>
         </div>
-        
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full max-w-3xl">
-            <div class="bg-white p-4 rounded-lg shadow-md flex items-center gap-3">
-                <div class="w-10 h-10 rounded-full bg-red-500 text-white flex items-center justify-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                    </svg>
-                </div>
-                <div>
-                    <h3 class="font-medium text-gray-800">Pencuri</h3>
-                    <p class="text-sm text-gray-600">Klik node untuk bergerak</p>
-                </div>
-            </div>
-            
-            <div class="bg-white p-4 rounded-lg shadow-md flex items-center gap-3">
-                <div class="w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-                    </svg>
-                </div>
-                <div>
-                    <h3 class="font-medium text-gray-800">Polisi</h3>
-                    <p class="text-sm text-gray-600">Mengejar dengan rute terpendek</p>
-                </div>
-            </div>
-            
-            <div class="bg-white p-4 rounded-lg shadow-md flex items-center gap-3">
-                <div class="w-10 h-10 rounded-full bg-green-500 text-white flex items-center justify-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                    </svg>
-                </div>
-                <div>
-                    <h3 class="font-medium text-gray-800">Rumah</h3>
-                    <p class="text-sm text-gray-600">Tujuan pencuri</p>
-                </div>
-            </div>
+
+        <div class="game-container relative mx-auto">
+          <canvas
+            id="gameCanvas"
+            width="600"
+            height="650"
+            class="border border-gray-300 rounded-lg shadow-sm cursor-pointer mx-auto mb-20"
+          ></canvas>
+          <div id="message" class="message hidden"></div>
+          <button id="restartBtn" class="restart-btn hidden">Main Lagi</button>
         </div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full max-w-3xl">
+        <div class="bg-white p-4 rounded-lg shadow-md flex items-center gap-3">
+          <div
+            class="w-10 h-10 rounded-full bg-red-500 text-white flex items-center justify-center"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+              />
+            </svg>
+          </div>
+          <div>
+            <h3 class="font-medium text-gray-800">Pencuri</h3>
+            <p class="text-sm text-gray-600">Klik node untuk bergerak</p>
+          </div>
+        </div>
+
+        <div class="bg-white p-4 rounded-lg shadow-md flex items-center gap-3">
+          <div
+            class="w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+              />
+            </svg>
+          </div>
+          <div>
+            <h3 class="font-medium text-gray-800">Polisi</h3>
+            <p class="text-sm text-gray-600">Mengejar dengan rute terpendek</p>
+          </div>
+        </div>
+
+        <div class="bg-white p-4 rounded-lg shadow-md flex items-center gap-3">
+          <div
+            class="w-10 h-10 rounded-full bg-green-500 text-white flex items-center justify-center"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-6 w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
+              />
+            </svg>
+          </div>
+          <div>
+            <h3 class="font-medium text-gray-800">Rumah</h3>
+            <p class="text-sm text-gray-600">Tujuan pencuri</p>
+          </div>
+        </div>
+      </div>
     </div>
-    
+
+    <!-- In your index.html -->
     <script>
-        // Simpan data posisi dan jalur dalam variabel JavaScript
-        const posisi = JSON.parse('{{ posisi | tojson | safe }}');
-        const jalur = JSON.parse('{{ jalur | tojson | safe }}');
+      // Make sure this syntax is correct
+      const posisi = JSON.parse("{{ posisi | tojson | safe }}");
+      const jalur = JSON.parse("{{ jalur | tojson | safe }}");
     </script>
     <script src="/static/script.js"></script>
-</body>
+  </body>
 </html>

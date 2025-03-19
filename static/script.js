@@ -2,7 +2,6 @@
 const canvas = document.getElementById("gameCanvas");
 const ctx = canvas.getContext("2d");
 const messageDiv = document.getElementById("message");
-const restartBtn = document.getElementById("restartBtn");
 
 // Colors
 const WHITE = "#FFFFFF";
@@ -23,13 +22,55 @@ let confettiActive = false;
 let validMoveNodes = [];
 let hoverNode = null;
 
-// Animation state
+// Animation state for thief
 let isAnimating = false;
 let animationProgress = 0;
 let animationStartPos = null;
 let animationEndPos = null;
 let animationStartTime = 0;
 const animationDuration = 500; // ms
+
+// Animation state for police - NEW
+let isPolisiAnimating = false;
+let polisiAnimationProgress = 0;
+let polisiAnimationStartPos = null;
+let polisiAnimationEndPos = null;
+let polisiAnimationStartTime = 0;
+const polisiAnimationDuration = 500; // ms
+
+// Define the graph structure and node positions
+const jalur = {
+  A: ["B", "C"],
+  B: ["A", "D", "E"],
+  C: ["A", "F"],
+  D: ["B", "G"],
+  E: ["B", "F", "H"],
+  F: ["C", "E", "I"],
+  G: ["D"],
+  H: ["E", "I", "J"],
+  I: ["F", "H", "K"],
+  J: ["H", "L"],
+  K: ["I", "L"],
+  L: ["J", "K", "HOME"],
+  HOME: ["L"],
+};
+
+// Adjust positions to fix the overlap between L and HOME
+const posisi = {
+  A: [300, 100],
+  B: [200, 200],
+  C: [400, 200],
+  D: [150, 300],
+  E: [250, 300],
+  F: [400, 300],
+  G: [100, 400],
+  H: [300, 400],
+  I: [450, 400],
+  J: [250, 500],
+  K: [400, 500],
+  L: [325, 520], // Moved L up a bit
+  HOME: [325, 600], // Kept HOME at the bottom
+};
 
 // Initialize
 function init() {
@@ -94,7 +135,33 @@ function gameLoop() {
     drawPencuri();
   }
 
-  drawPolisi();
+  // Draw police with animation - MODIFIED
+  if (isPolisiAnimating) {
+    const currentTime = Date.now();
+    const elapsed = currentTime - polisiAnimationStartTime;
+    polisiAnimationProgress = Math.min(elapsed / polisiAnimationDuration, 1);
+
+    if (polisiAnimationProgress >= 1) {
+      isPolisiAnimating = false;
+    } else {
+      // Draw animated polisi
+      const startX = polisiAnimationStartPos[0];
+      const startY = polisiAnimationStartPos[1];
+      const endX = polisiAnimationEndPos[0];
+      const endY = polisiAnimationEndPos[1];
+
+      // Use easeInOutQuad for smoother animation
+      const progress = easeInOutQuad(polisiAnimationProgress);
+      const currentX = startX + (endX - startX) * progress;
+      const currentY = startY + (endY - startY) * progress;
+
+      drawPolisi(currentX, currentY);
+    }
+  }
+
+  if (!isPolisiAnimating) {
+    drawPolisi();
+  }
 
   // Continue animation
   animationFrame = requestAnimationFrame(gameLoop);
@@ -287,9 +354,11 @@ function drawPencuri(customX, customY) {
   ctx.fill();
 }
 
-// Draw police
-function drawPolisi() {
-  const [x, y] = posisi[polisiPos];
+// Draw police - MODIFIED to accept custom coordinates
+function drawPolisi(customX, customY) {
+  const [defaultX, defaultY] = posisi[polisiPos];
+  const x = customX !== undefined ? customX : defaultX;
+  const y = customY !== undefined ? customY : defaultY;
 
   // Shadow
   ctx.beginPath();
@@ -336,7 +405,7 @@ function getClickedNode(x, y) {
   return null;
 }
 
-// Start animation between nodes
+// Start animation between nodes for thief
 function startAnimation(startNode, endNode) {
   if (!posisi[startNode] || !posisi[endNode]) return;
 
@@ -347,9 +416,22 @@ function startAnimation(startNode, endNode) {
   isAnimating = true;
 }
 
-// Update game state
+// Start animation between nodes for police - NEW
+function startPolisiAnimation(startNode, endNode) {
+  if (!posisi[startNode] || !posisi[endNode]) return;
+
+  polisiAnimationStartPos = posisi[startNode];
+  polisiAnimationEndPos = posisi[endNode];
+  polisiAnimationProgress = 0;
+  polisiAnimationStartTime = Date.now();
+  isPolisiAnimating = true;
+}
+
+// Update game state - MODIFIED to animate police movement
 function updateGame(data) {
   const oldPencuriPos = pencuriPos;
+  const oldPolisiPos = polisiPos; // Store old police position
+
   pencuriPos = data.pencuri_pos;
   polisiPos = data.polisi_pos;
   gameOver = data.game_over;
@@ -359,13 +441,34 @@ function updateGame(data) {
     startAnimation(oldPencuriPos, pencuriPos);
   }
 
+  // Start animation for polisi movement
+  if (oldPolisiPos !== polisiPos) {
+    startPolisiAnimation(oldPolisiPos, polisiPos);
+  }
+
   // Update valid moves
   updateValidMoves();
 
   if (gameOver) {
-    messageDiv.textContent = data.message;
+    // Create message content with button inside
+    messageDiv.innerHTML =
+      data.message +
+      '<button id="restartBtn" class="restart-btn">Main Lagi</button>';
     messageDiv.classList.remove("hidden");
-    restartBtn.classList.remove("hidden");
+
+    // Add event listener to the new button
+    document.getElementById("restartBtn").addEventListener("click", () => {
+      fetch("/restart", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          updateGame(data);
+          messageDiv.classList.add("hidden");
+          confettiActive = false;
+        });
+    });
 
     // Celebrate with confetti if thief wins
     if (data.message.includes("Pencuri Menang")) {
@@ -577,25 +680,14 @@ canvas.addEventListener("touchstart", (e) => {
   }
 });
 
-restartBtn.addEventListener("click", () => {
-  fetch("/restart", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-  })
-    .then((response) => response.json())
-    .then((data) => {
-      updateGame(data);
-      messageDiv.classList.add("hidden");
-      restartBtn.classList.add("hidden");
-      confettiActive = false;
-    });
-});
-
 // Add keyboard support
 document.addEventListener("keydown", (e) => {
-  if (gameOver || isAnimating) {
+  if (gameOver || isAnimating || isPolisiAnimating) {
+    // Added check for police animation
     if (e.key === "Enter" || e.key === " ") {
-      restartBtn.click();
+      // Find and click the restart button if it exists
+      const restartBtn = document.getElementById("restartBtn");
+      if (restartBtn) restartBtn.click();
     }
     return;
   }
