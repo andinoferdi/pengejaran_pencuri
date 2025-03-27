@@ -30,7 +30,7 @@ let animationEndPos = null;
 let animationStartTime = 0;
 const animationDuration = 500; // ms
 
-// Animation state for police - NEW
+// Animation state for police
 let isPolisiAnimating = false;
 let polisiAnimationProgress = 0;
 let polisiAnimationStartPos = null;
@@ -135,7 +135,7 @@ function gameLoop() {
     drawPencuri();
   }
 
-  // Draw police with animation - MODIFIED
+  // Draw police with animation
   if (isPolisiAnimating) {
     const currentTime = Date.now();
     const elapsed = currentTime - polisiAnimationStartTime;
@@ -172,9 +172,9 @@ function easeInOutQuad(t) {
   return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
 }
 
-// Update valid moves
+// Update valid moves - MODIFIED to show police valid moves
 function updateValidMoves() {
-  validMoveNodes = jalur[pencuriPos] || [];
+  validMoveNodes = jalur[polisiPos] || [];
 }
 
 // Draw maze
@@ -201,7 +201,7 @@ function drawLabirin() {
   for (const node in posisi) {
     if (node === "HOME") continue; // Skip HOME node, it will be drawn separately
 
-    // Check if this node is a valid move for the thief
+    // Check if this node is a valid move for the police
     const isValidMove = !gameOver && validMoveNodes.includes(node);
     const isHovered = node === hoverNode;
 
@@ -210,8 +210,8 @@ function drawLabirin() {
       ctx.beginPath();
       ctx.arc(posisi[node][0], posisi[node][1], 22, 0, Math.PI * 2);
       ctx.fillStyle = isHovered
-        ? "rgba(249, 115, 22, 0.4)"
-        : "rgba(249, 115, 22, 0.2)"; // Orange highlight
+        ? "rgba(59, 130, 246, 0.4)" // Blue highlight for police
+        : "rgba(59, 130, 246, 0.2)";
       ctx.fill();
     }
 
@@ -245,7 +245,7 @@ function drawHome() {
   const [x, y] = posisi["HOME"];
   const size = 40; // House size
 
-  // Check if HOME is a valid move for the thief
+  // Check if HOME is a valid move for the police
   const isValidMove = !gameOver && validMoveNodes.includes("HOME");
   const isHovered = "HOME" === hoverNode;
 
@@ -254,8 +254,8 @@ function drawHome() {
     ctx.beginPath();
     ctx.arc(x, y, 35, 0, Math.PI * 2);
     ctx.fillStyle = isHovered
-      ? "rgba(249, 115, 22, 0.4)"
-      : "rgba(249, 115, 22, 0.2)"; // Orange highlight
+      ? "rgba(59, 130, 246, 0.4)" // Blue highlight for police
+      : "rgba(59, 130, 246, 0.2)";
     ctx.fill();
   }
 
@@ -354,7 +354,7 @@ function drawPencuri(customX, customY) {
   ctx.fill();
 }
 
-// Draw police - MODIFIED to accept custom coordinates
+// Draw police
 function drawPolisi(customX, customY) {
   const [defaultX, defaultY] = posisi[polisiPos];
   const x = customX !== undefined ? customX : defaultX;
@@ -416,7 +416,7 @@ function startAnimation(startNode, endNode) {
   isAnimating = true;
 }
 
-// Start animation between nodes for police - NEW
+// Start animation between nodes for police
 function startPolisiAnimation(startNode, endNode) {
   if (!posisi[startNode] || !posisi[endNode]) return;
 
@@ -427,10 +427,10 @@ function startPolisiAnimation(startNode, endNode) {
   isPolisiAnimating = true;
 }
 
-// Update game state - MODIFIED to animate police movement
+// Update game state
 function updateGame(data) {
   const oldPencuriPos = pencuriPos;
-  const oldPolisiPos = polisiPos; // Store old police position
+  const oldPolisiPos = polisiPos;
 
   pencuriPos = data.pencuri_pos;
   polisiPos = data.polisi_pos;
@@ -582,26 +582,9 @@ function showPath(path) {
   }, 1000);
 }
 
-// Add pulse effect to a node
-function addPulseEffect(node) {
-  const nodeElement = document.createElement("div");
-  nodeElement.classList.add("pulse-effect");
-
-  const [x, y] = posisi[node];
-  nodeElement.style.left = `${x}px`;
-  nodeElement.style.top = `${y}px`;
-
-  document.querySelector(".game-container").appendChild(nodeElement);
-
-  // Remove after animation
-  setTimeout(() => {
-    nodeElement.remove();
-  }, 1000);
-}
-
 // Handle mouse move for hover effects
 function handleMouseMove(e) {
-  if (gameOver || isAnimating) return;
+  if (gameOver || isPolisiAnimating) return;
 
   const rect = canvas.getBoundingClientRect();
   const x = (e.clientX - rect.left) / scale;
@@ -621,7 +604,7 @@ function handleMouseMove(e) {
 
 // Event listeners
 canvas.addEventListener("click", (e) => {
-  if (gameOver || isAnimating) return;
+  if (gameOver || isPolisiAnimating) return;
 
   const rect = canvas.getBoundingClientRect();
   const x = (e.clientX - rect.left) / scale;
@@ -630,7 +613,7 @@ canvas.addEventListener("click", (e) => {
   const clickedNode = getClickedNode(x, y);
   if (clickedNode && validMoveNodes.includes(clickedNode)) {
     // Show path before moving
-    const path = findPath(pencuriPos, clickedNode);
+    const path = findPath(polisiPos, clickedNode);
     showPath(path);
 
     fetch("/move", {
@@ -653,7 +636,7 @@ canvas.addEventListener("mousemove", handleMouseMove);
 canvas.addEventListener("touchstart", (e) => {
   e.preventDefault(); // Prevent scrolling
 
-  if (gameOver || isAnimating) return;
+  if (gameOver || isPolisiAnimating) return;
 
   const rect = canvas.getBoundingClientRect();
   const touch = e.touches[0];
@@ -663,7 +646,7 @@ canvas.addEventListener("touchstart", (e) => {
   const clickedNode = getClickedNode(x, y);
   if (clickedNode && validMoveNodes.includes(clickedNode)) {
     // Show path before moving
-    const path = findPath(pencuriPos, clickedNode);
+    const path = findPath(polisiPos, clickedNode);
     showPath(path);
 
     fetch("/move", {
@@ -682,8 +665,7 @@ canvas.addEventListener("touchstart", (e) => {
 
 // Add keyboard support
 document.addEventListener("keydown", (e) => {
-  if (gameOver || isAnimating || isPolisiAnimating) {
-    // Added check for police animation
+  if (gameOver || isPolisiAnimating) {
     if (e.key === "Enter" || e.key === " ") {
       // Find and click the restart button if it exists
       const restartBtn = document.getElementById("restartBtn");
@@ -693,7 +675,7 @@ document.addEventListener("keydown", (e) => {
   }
 
   // Get current position coordinates
-  const [currentX, currentY] = posisi[pencuriPos];
+  const [currentX, currentY] = posisi[polisiPos];
 
   // Find the closest valid move in each direction
   let closestUp = null,
@@ -753,7 +735,7 @@ document.addEventListener("keydown", (e) => {
 
   if (targetNode) {
     // Show path before moving
-    const path = findPath(pencuriPos, targetNode);
+    const path = findPath(polisiPos, targetNode);
     showPath(path);
 
     fetch("/move", {
@@ -777,9 +759,9 @@ function showTutorial() {
   tutorial.innerHTML = `
         <div class="tutorial-content">
             <h2>Cara Bermain</h2>
-            <p>1. Klik pada node yang terhubung untuk menggerakkan pencuri</p>
-            <p>2. Hindari polisi yang akan mengejarmu</p>
-            <p>3. Capai rumah (HOME) untuk menang</p>
+            <p>1. Klik pada node yang terhubung untuk menggerakkan polisi</p>
+            <p>2. Kejar pencuri sebelum dia mencapai rumah (HOME)</p>
+            <p>3. Pencuri bergerak otomatis menuju HOME</p>
             <button id="closeTutorial">Mulai Bermain</button>
         </div>
     `;
