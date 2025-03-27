@@ -3,121 +3,137 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Pengejaran Pencuri</title>
-    <link
-      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
-      rel="stylesheet"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-    />
+    <meta name="theme-color" content="#0f172a">
+    <title>Pengejaran Pencuri | Game Strategi</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <link rel="stylesheet" href="/static/styles.css" />
-    <link rel="icon" href="/static/favico.png" type="image/x-icon" />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🕵️</text></svg>" type="image/svg+xml">
   </head>
-  <body class="bg-gradient-to-b from-gray-100 to-gray-200 min-h-screen">
-    <div
-      class="container mx-auto px-4 py-8 flex flex-col items-center justify-center"
-    >
-      <div
-        class="w-full max-w-3xl bg-white rounded-xl shadow-lg overflow-hidden mb-6"
-      >
-        <div class="p-4 text-center">
-          <h1 class="text-2xl font-bold text-gray-800">Pengejaran Pencuri</h1>
-          <p class="text-gray-600">
-            Kejar pencuri sebelum dia mencapai rumah!
-          </p>
+  <body class="game-body">
+    <div class="stars"></div>
+    <div class="twinkling"></div>
+    
+    <header class="game-header">
+      <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+        <div class="flex items-center">
+          <div class="game-logo">
+            <span class="thief">🕵️</span>
+            <span class="police">👮</span>
+          </div>
+          <h1 class="text-2xl md:text-3xl font-bold text-white ml-3">Pengejaran Pencuri</h1>
+        </div>
+        <div class="hidden md:flex items-center space-x-4">
+          <button id="soundToggle" class="game-btn-small">
+            <i class="fas fa-volume-up"></i>
+          </button>
+          <button id="fullscreenToggle" class="game-btn-small">
+            <i class="fas fa-expand"></i>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-6">
+      <div class="game-dashboard">
+        <div class="game-stats">
+          <div class="stat-card">
+            <div class="stat-icon thief-icon">🕵️</div>
+            <div class="stat-info">
+              <h3>Pencuri</h3>
+              <p id="thiefStatus">Bergerak ke HOME</p>
+            </div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-icon police-icon">👮</div>
+            <div class="stat-info">
+              <h3>Polisi</h3>
+              <p>Dikendalikan Pemain</p>
+            </div>
+          </div>
+          
+          <div class="stat-card">
+            <div class="stat-icon home-icon">🏠</div>
+            <div class="stat-info">
+              <h3>HOME</h3>
+              <p>Tujuan Pencuri</p>
+            </div>
+          </div>
         </div>
 
         <div class="game-container relative mx-auto">
-          <canvas
-            id="gameCanvas"
-            width="600"
-            height="650"
-            class="border border-gray-300 rounded-lg shadow-sm cursor-pointer mx-auto mb-20"
-          ></canvas>
-          <div id="message" class="message hidden"></div>
-          <button id="restartBtn" class="restart-btn hidden">Main Lagi</button>
+          <div class="game-frame">
+            <canvas
+              id="gameCanvas"
+              width="600"
+              height="650"
+              class="game-canvas"
+            ></canvas>
+            <div id="message" class="message hidden"></div>
+          </div>
+          
+          <div class="game-controls">
+            <button id="debugToggle" class="game-btn">
+              <i class="fas fa-bug mr-2"></i> Tampilkan Debug
+            </button>
+            <button id="restartGame" class="game-btn">
+              <i class="fas fa-redo mr-2"></i> Mulai Ulang
+            </button>
+          </div>
+          
+          <!-- Debug info panel -->
+          <div id="debugInfo" class="debug-info hidden"></div>
         </div>
       </div>
 
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full max-w-3xl">
-        <div class="bg-white p-4 rounded-lg shadow-md flex items-center gap-3">
-          <div
-            class="w-10 h-10 rounded-full bg-red-500 text-white flex items-center justify-center"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              class="h-6 w-6"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-              />
-            </svg>
+      <div class="game-instructions">
+        <h2 class="instructions-title">Cara Bermain</h2>
+        <div class="instructions-grid">
+          <div class="instruction-card">
+            <div class="instruction-number">1</div>
+            <p>Klik pada node yang terhubung untuk menggerakkan polisi</p>
           </div>
-          <div>
-            <h3 class="font-medium text-gray-800">Pencuri</h3>
-            <p class="text-sm text-gray-600">Bergerak otomatis</p>
+          <div class="instruction-card">
+            <div class="instruction-number">2</div>
+            <p>Kejar pencuri sebelum dia mencapai rumah (HOME)</p>
           </div>
-        </div>
-
-        <div class="bg-white p-4 rounded-lg shadow-md flex items-center gap-3">
-          <div
-            class="w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              class="h-6 w-6"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
-              />
-            </svg>
+          <div class="instruction-card">
+            <div class="instruction-number">3</div>
+            <p>Pencuri bergerak otomatis dengan AI cerdas</p>
           </div>
-          <div>
-            <h3 class="font-medium text-gray-800">Polisi</h3>
-            <p class="text-sm text-gray-600">Klik node untuk bergerak</p>
-          </div>
-        </div>
-
-        <div class="bg-white p-4 rounded-lg shadow-md flex items-center gap-3">
-          <div
-            class="w-10 h-10 rounded-full bg-green-500 text-white flex items-center justify-center"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              class="h-6 w-6"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
-              />
-            </svg>
-          </div>
-          <div>
-            <h3 class="font-medium text-gray-800">Rumah</h3>
-            <p class="text-sm text-gray-600">Tujuan pencuri</p>
+          <div class="instruction-card">
+            <div class="instruction-number">4</div>
+            <p>Gunakan tombol panah keyboard untuk bergerak lebih cepat</p>
           </div>
         </div>
       </div>
-    </div>
+    </main>
+
+    <footer class="game-footer">
+      <div class="container mx-auto px-4 py-3">
+        <p class="text-center text-gray-400">
+          &copy; 2025 Pengejaran Pencuri | Game Strategi Berbasis AI
+        </p>
+      </div>
+    </footer>
+
+    <!-- Game audio -->
+    <audio id="bgMusic" loop preload="auto">
+      <source src="https://assets.mixkit.co/music/preview/mixkit-game-level-music-689.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="moveSound" preload="auto">
+      <source src="https://assets.mixkit.co/sfx/preview/mixkit-arcade-game-jump-coin-216.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="winSound" preload="auto">
+      <source src="https://assets.mixkit.co/sfx/preview/mixkit-winning-chimes-2015.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="loseSound" preload="auto">
+      <source src="https://assets.mixkit.co/sfx/preview/mixkit-retro-arcade-game-over-470.mp3" type="audio/mpeg">
+    </audio>
 
     <!-- In your index.html -->
     <script>
