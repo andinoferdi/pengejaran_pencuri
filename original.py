@@ -21,31 +21,20 @@ font = pygame.font.SysFont(None, 40)
 
 # Graf jalur pencuri & polisi
 jalur = {
-    "A": ["B", "C"],
-    "B": ["A", "D", "E"],
-    "C": ["A", "F"],
-    "D": ["B", "G"],
-    "E": ["B", "F", "H"],
-    "F": ["C", "E", "I"],
-    "G": ["D"],
-    "H": ["E", "I", "J"],
-    "I": ["F", "H", "K"],
-    "J": ["H", "L"],
-    "K": ["I", "L"],
-    "L": ["J", "K", "HOME"],
-    "HOME": ["L"]
+    "A": ["B", "C"], "B": ["A", "D", "E"], "C": ["A", "F"],
+    "D": ["B", "G"], "E": ["B", "F", "H"], "F": ["C", "E", "I"],
+    "G": ["D"], "H": ["E", "I", "J"], "I": ["F", "H", "K"],
+    "J": ["H", "L"], "K": ["I", "L"], "L": ["J", "K", "HOME"], "HOME": ["L"]
 }
 
 # Posisi node di layar
 posisi = {
-    "A": (300, 100), "B": (200, 200), "C": (400, 200),
-    "D": (150, 300), "E": (250, 300), "F": (400, 300),
-    "G": (100, 400), "H": (300, 400), "I": (450, 400),
-    "J": (250, 500), "K": (400, 500),
-    "L": (325, 550), "HOME": (325, 600)
+    "A": (300, 100), "B": (200, 200), "C": (400, 200), "D": (150, 300), "E": (250, 300),
+    "F": (400, 300), "G": (100, 400), "H": (300, 400), "I": (450, 400), "J": (250, 500),
+    "K": (400, 500), "L": (325, 550), "HOME": (325, 600)
 }
 
-# Fungsi mencari jalur terpendek (BFS)
+# Fungsi mencari jalur terpendek (BFS) untuk pencuri
 def bfs(start, goal):
     queue = collections.deque([[start]])
     visited = set()
@@ -53,35 +42,27 @@ def bfs(start, goal):
     while queue:
         path = queue.popleft()
         node = path[-1]
-
         if node == goal:
-            return path[1]  # Langkah pertama setelah polisi
-
+            return path[1]  # Langkah pertama setelah pencuri
         if node not in visited:
             visited.add(node)
             for neighbor in jalur.get(node, []):
                 new_path = list(path)
                 new_path.append(neighbor)
                 queue.append(new_path)
-    
     return None  # Jika tidak ada jalur
 
 # Fungsi menggambar labirin
 def draw_labirin():
     screen.fill(WHITE)
-    
-    # Gambar garis jalur
     for node, neighbors in jalur.items():
         for neighbor in neighbors:
             pygame.draw.line(screen, BLACK, posisi[node], posisi[neighbor], 2)
-    
-    # Gambar node dan label
     for node, (x, y) in posisi.items():
         pygame.draw.circle(screen, BLACK, (x, y), 15)
         text = font.render(node, True, BLACK)
         screen.blit(text, (x - 10, y - 25))
-    
-    pygame.draw.circle(screen, GREEN, posisi["HOME"], 20)  # Rumah tujuan
+    pygame.draw.circle(screen, GREEN, posisi["HOME"], 20)
 
 # Fungsi menggambar karakter
 def draw_pencuri(pos):
@@ -93,7 +74,7 @@ def draw_polisi(pos):
 # Fungsi menangani klik pada node
 def get_clicked_node(x, y):
     for node, (nx, ny) in posisi.items():
-        if (x - nx) ** 2 + (y - ny) ** 2 <= 15 ** 2:  # Cek dalam lingkaran
+        if (x - nx) ** 2 + (y - ny) ** 2 <= 15 ** 2:
             return node
     return None
 
@@ -118,8 +99,8 @@ def restart_game():
 pencuri_pos = "A"
 polisi_pos = "HOME"
 game_over = False
-
 running = True
+
 while running:
     screen.fill(WHITE)
     draw_labirin()
@@ -136,22 +117,17 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-
         elif event.type == pygame.MOUSEBUTTONDOWN and game_over:
             mx, my = pygame.mouse.get_pos()
             if WIDTH // 2 - 60 <= mx <= WIDTH // 2 + 60 and HEIGHT // 2 <= my <= HEIGHT // 2 + 40:
                 restart_game()
-        
         elif event.type == pygame.MOUSEBUTTONDOWN and not game_over:
             mx, my = pygame.mouse.get_pos()
             clicked_node = get_clicked_node(mx, my)
-            
-            if clicked_node and clicked_node in jalur[pencuri_pos]:
-                pencuri_pos = clicked_node  # Pindah pencuri
-                
-                # Polisi mengejar pencuri
-                next_move = bfs(polisi_pos, pencuri_pos)
+            if clicked_node and clicked_node in jalur[polisi_pos]:
+                polisi_pos = clicked_node  # Polisi dikontrol pemain
+                next_move = bfs(pencuri_pos, "HOME")  # Pencuri bergerak otomatis
                 if next_move:
-                    polisi_pos = next_move
+                    pencuri_pos = next_move
 
 pygame.quit()
