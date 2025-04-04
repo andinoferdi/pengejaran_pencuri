@@ -671,6 +671,9 @@ function drawPencuri(customX, customY) {
   }
 }
 
+// Add a new variable to track police state
+let policeState = "normal"; // Can be "normal", "chasing", "close"
+
 // Draw police
 function drawPolisi(customX, customY) {
   const [defaultX, defaultY] = posisi[polisiPos];
@@ -683,26 +686,62 @@ function drawPolisi(customX, customY) {
   ctx.fillStyle = "rgba(0, 0, 0, 0.3)";
   ctx.fill();
 
-  // Police with gradient
+  // Police with gradient based on state
   const policeGradient = ctx.createRadialGradient(x, y, 0, x, y, 22);
-  policeGradient.addColorStop(0, "#3b82f6");
-  policeGradient.addColorStop(1, "#1d4ed8");
+
+  if (policeState === "close") {
+    // Intense blue when close to catching thief
+    policeGradient.addColorStop(0, "#2563eb");
+    policeGradient.addColorStop(1, "#1e40af");
+  } else if (policeState === "chasing") {
+    // Brighter blue when chasing
+    policeGradient.addColorStop(0, "#3b82f6");
+    policeGradient.addColorStop(1, "#1d4ed8");
+  } else {
+    // Normal blue
+    policeGradient.addColorStop(0, "#60a5fa");
+    policeGradient.addColorStop(1, "#3b82f6");
+  }
 
   ctx.beginPath();
   ctx.arc(x, y, 22, 0, Math.PI * 2);
   ctx.fillStyle = policeGradient;
   ctx.fill();
 
-  // Add glow effect
-  ctx.shadowColor = "rgba(59, 130, 246, 0.7)";
-  ctx.shadowBlur = 10;
-  ctx.stroke();
-  ctx.shadowBlur = 0;
+  // Add glow effect based on state
+  if (policeState === "close") {
+    ctx.shadowColor = "rgba(37, 99, 235, 0.9)";
+    ctx.shadowBlur = 15;
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+  } else if (policeState === "chasing") {
+    ctx.shadowColor = "rgba(59, 130, 246, 0.7)";
+    ctx.shadowBlur = 10;
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+  } else {
+    ctx.shadowColor = "rgba(96, 165, 250, 0.5)";
+    ctx.shadowBlur = 5;
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+  }
 
   // Police hat
   ctx.fillStyle = "#1E3A8A"; // Darker blue
   ctx.beginPath();
   ctx.ellipse(x, y - 8, 15, 7, 0, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Add hat details
+  ctx.fillStyle = "#60A5FA"; // Light blue badge on hat
+  ctx.beginPath();
+  ctx.arc(x, y - 8, 4, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Hat brim
+  ctx.fillStyle = "#1E3A8A";
+  ctx.beginPath();
+  ctx.ellipse(x, y - 3, 18, 4, 0, 0, Math.PI);
   ctx.fill();
 
   // Police badge
@@ -711,12 +750,156 @@ function drawPolisi(customX, customY) {
   ctx.arc(x, y + 5, 5, 0, Math.PI * 2);
   ctx.fill();
 
-  // Police eyes
+  // Badge details
+  ctx.strokeStyle = "#B45309"; // Dark gold
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.arc(x, y + 5, 3, 0, Math.PI * 2);
+  ctx.stroke();
+
+  // Badge star
+  ctx.beginPath();
+  for (let i = 0; i < 5; i++) {
+    const angle = (i * 2 * Math.PI) / 5 - Math.PI / 2;
+    const pointX = x + 3 * Math.cos(angle);
+    const pointY = y + 5 + 3 * Math.sin(angle);
+    if (i === 0) {
+      ctx.moveTo(pointX, pointY);
+    } else {
+      ctx.lineTo(pointX, pointY);
+    }
+  }
+  ctx.closePath();
+  ctx.strokeStyle = "#B45309";
+  ctx.stroke();
+
+  // Police eyes - change based on state
   ctx.fillStyle = WHITE;
   ctx.beginPath();
-  ctx.arc(x - 5, y - 3, 3, 0, Math.PI * 2);
-  ctx.arc(x + 5, y - 3, 3, 0, Math.PI * 2);
+
+  if (policeState === "close") {
+    // Narrowed eyes when close to catching
+    ctx.ellipse(x - 5, y - 3, 3, 2, 0, 0, Math.PI * 2);
+    ctx.ellipse(x + 5, y - 3, 3, 2, 0, 0, Math.PI * 2);
+  } else {
+    // Normal eyes
+    ctx.arc(x - 5, y - 3, 3, 0, Math.PI * 2);
+    ctx.arc(x + 5, y - 3, 3, 0, Math.PI * 2);
+  }
   ctx.fill();
+
+  // Add eyebrows based on state
+  ctx.strokeStyle = "#1E3A8A";
+  ctx.lineWidth = 1.5;
+  ctx.beginPath();
+
+  if (policeState === "close") {
+    // Angry eyebrows when close
+    ctx.moveTo(x - 9, y - 7);
+    ctx.lineTo(x - 2, y - 4);
+    ctx.moveTo(x + 9, y - 7);
+    ctx.lineTo(x + 2, y - 4);
+  } else if (policeState === "chasing") {
+    // Determined eyebrows when chasing
+    ctx.moveTo(x - 8, y - 6);
+    ctx.lineTo(x - 2, y - 5);
+    ctx.moveTo(x + 8, y - 6);
+    ctx.lineTo(x + 2, y - 5);
+  } else {
+    // Normal eyebrows
+    ctx.moveTo(x - 7, y - 6);
+    ctx.lineTo(x - 3, y - 5);
+    ctx.moveTo(x + 7, y - 6);
+    ctx.lineTo(x + 3, y - 5);
+  }
+  ctx.stroke();
+
+  // Add mouth - expression changes based on state
+  ctx.beginPath();
+  if (policeState === "close") {
+    // Determined expression when close
+    ctx.moveTo(x - 6, y + 8);
+    ctx.lineTo(x + 6, y + 8);
+  } else if (policeState === "chasing") {
+    // Slight smile when chasing
+    ctx.moveTo(x - 5, y + 7);
+    ctx.quadraticCurveTo(x, y + 9, x + 5, y + 7);
+  } else {
+    // Neutral expression
+    ctx.moveTo(x - 5, y + 8);
+    ctx.lineTo(x + 5, y + 8);
+  }
+  ctx.strokeStyle = WHITE;
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+
+  // Add uniform collar
+  ctx.fillStyle = "#1E3A8A";
+  ctx.beginPath();
+  ctx.moveTo(x - 10, y + 12);
+  ctx.lineTo(x - 5, y + 16);
+  ctx.lineTo(x + 5, y + 16);
+  ctx.lineTo(x + 10, y + 12);
+  ctx.fill();
+
+  // Add dynamic pulsing effect based on state
+  if (policeState === "close") {
+    // Fast pulsing when close to thief
+    ctx.beginPath();
+    ctx.arc(x, y, 25 + Math.sin(Date.now() / 100) * 5, 0, Math.PI * 2);
+    ctx.strokeStyle = "#2563eb"; // Bright blue
+    ctx.lineWidth = 3;
+    ctx.stroke();
+
+    // Second pulse ring
+    ctx.beginPath();
+    ctx.arc(x, y, 35 + Math.sin(Date.now() / 150) * 3, 0, Math.PI * 2);
+    ctx.strokeStyle = "rgba(37, 99, 235, 0.5)";
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  } else if (policeState === "chasing" || isPolisiAnimating) {
+    // Medium pulsing when chasing or moving
+    ctx.beginPath();
+    ctx.arc(x, y, 25 + Math.sin(Date.now() / 200) * 3, 0, Math.PI * 2);
+    ctx.strokeStyle = "#3b82f6"; // Blue
+    ctx.lineWidth = 2;
+    ctx.stroke();
+  }
+
+  // Add light flashes for police effect when close to thief
+  if (policeState === "close") {
+    // Police light effect (alternating red and blue)
+    const time = Date.now();
+    if (Math.floor(time / 300) % 2 === 0) {
+      // Red flash
+      ctx.beginPath();
+      ctx.arc(x - 10, y - 15, 5, 0, Math.PI * 2);
+      ctx.fillStyle = "rgba(239, 68, 68, 0.8)"; // Red
+      ctx.fill();
+
+      // Red glow
+      ctx.shadowColor = "rgba(239, 68, 68, 0.8)";
+      ctx.shadowBlur = 10;
+      ctx.beginPath();
+      ctx.arc(x - 10, y - 15, 3, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.shadowBlur = 0;
+    } else {
+      // Blue flash
+      ctx.beginPath();
+      ctx.arc(x + 10, y - 15, 5, 0, Math.PI * 2);
+      ctx.fillStyle = "rgba(59, 130, 246, 0.8)"; // Blue
+      ctx.fill();
+
+      // Blue glow
+      ctx.shadowColor = "rgba(59, 130, 246, 0.8)";
+      ctx.shadowBlur = 10;
+      ctx.beginPath();
+      ctx.arc(x + 10, y - 15, 3, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.shadowBlur = 0;
+    }
+  }
 }
 
 // Get clicked node
@@ -791,10 +974,13 @@ function updateGame(data) {
     // Set tingkat bahaya
     if (highDanger) {
       dangerMode = "high";
+      policeState = "close"; // Police is close to thief
     } else if (mediumDanger) {
       dangerMode = "medium";
+      policeState = "chasing"; // Police is chasing thief
     } else {
       dangerMode = false;
+      policeState = "normal"; // Police is in normal state
     }
   }
 
