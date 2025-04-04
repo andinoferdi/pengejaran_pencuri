@@ -85,7 +85,6 @@
             </button>
           </div>
           
-          <!-- Debug info panel -->
           <div id="debugInfo" class="debug-info hidden"></div>
         </div>
       </div>
@@ -121,31 +120,11 @@
       </div>
     </footer>
 
-    <!-- Game audio -->
-    <audio id="bgMusic" loop preload="auto">
-      <source src="https://assets.mixkit.co/music/preview/mixkit-game-level-music-689.mp3" type="audio/mpeg">
-    </audio>
-    <audio id="moveSound" preload="auto">
-      <source src="https://assets.mixkit.co/sfx/preview/mixkit-arcade-game-jump-coin-216.mp3" type="audio/mpeg">
-    </audio>
-    <audio id="winSound" preload="auto">
-      <source src="https://assets.mixkit.co/sfx/preview/mixkit-winning-chimes-2015.mp3" type="audio/mpeg">
-    </audio>
-    <audio id="loseSound" preload="auto">
-      <source src="https://assets.mixkit.co/sfx/preview/mixkit-retro-arcade-game-over-470.mp3" type="audio/mpeg">
-    </audio>
-
-    <!-- In your index.html -->
     <script>
-      // Make sure this syntax is correct
       const posisi = JSON.parse("{{ posisi | tojson | safe }}");
       const jalur = JSON.parse("{{ jalur | tojson | safe }}");
     </script>
     <script src="/static/script.js"></script>
-    <!-- Load modular JavaScript files -->
-    <!-- <script src="/static/game-rendering.js"></script>
-    <script src="/static/game-logic.js"></script>
-    <script src="/static/game-core.js"></script>
-    <script src="/static/game-shared.js"></script> -->
+  
   </body>
 </html>
